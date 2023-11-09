@@ -1,7 +1,7 @@
 const app = require('./config/app')
 var http = require('http');
 var debug = require('debug')('comp229-group-project:server');
-// var setDb = require('./config/db')
+var setDb = require('./config/db')
 
 /**
  * Normalize a port into a number, string, or false.
@@ -26,7 +26,7 @@ function normalizePort(val) {
 /**
  * Get port from environment and store in Express.
  */
-// setDb();
+setDb();
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
