@@ -1,14 +1,19 @@
-// May be of use for developing endpoints
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-// const mongoose = require('mongoose');
-// const Schema = mongoose.Schema;
+const ProductSchema = new Schema({
+    title: String,
+    description: String,
+    price: Number,
+    currency: String,
+    location: String,
+    seller: {
+      id: String,
+      name: String
+    },
+    image: String,
+    category: String,
+    postedAt: Date
+  });
 
-// const ProductSchema = new Schema({
-//   name: String,
-//   description: String,
-//   price: Number,
-//   published: Boolean,
-//   category: String,
-// });
-
-// module.exports = mongoose.model('product', ProductSchema);
+module.exports = mongoose.model('product', ProductSchema);

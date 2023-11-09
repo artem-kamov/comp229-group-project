@@ -1,18 +1,15 @@
-// May be of use for developing endpoints
+var express = require('express');
+var productController = require("../controllers/product")
+var router = express.Router();
 
+router.get('/products', productController.list);
 
-// var express = require('express');
-// var productController = require("../controllers/product")
-// var router = express.Router();
+router.get('/products/:id', productController.listOne);
 
-// router.get('/products', productController.list);
+router.post('/products', productController.create);
 
-// router.get('/products/:id', productController.listOne);
+router.put('/products/:id', productController.update);
 
-// router.post('/products', productController.create);
+router.delete('/products/:id', productController.erase);
 
-// router.put('/products/:id', productController.update);
-
-// router.delete('/products/:id', productController.erase);
-
-// module.exports = router;
+module.exports = router;
