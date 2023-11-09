@@ -3,7 +3,7 @@ let config = require('./config');
 
 module.exports = function(){
 
-    mongoose.connect(config.ATLASDB);
+    mongoose.connect(config.ATLAS_DB);
 
     let mongodb = mongoose.connection;
 
