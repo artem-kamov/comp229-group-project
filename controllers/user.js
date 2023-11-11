@@ -2,11 +2,11 @@ let UserModel = require('../models/user');
 
 module.exports.list = async function (req, res, next) {
   try {
-    let allUsers = await UserModel.find({});
+    let allUsers = await UserModel.find({}, '-hashed_password -salt');
     res.json({
       message: "Users found succesfully",
       success: true,
-      products: allUsers,
+      users: allUsers,
     });
   } catch (err) {
     console.log(err);
@@ -14,64 +14,121 @@ module.exports.list = async function (req, res, next) {
   }
 }
 
-module.exports.listOne = async function (req, res, next) {
+module.exports.userByID = async function (req, res, next) {
   try {
-    let id = req.params.id;
-    let selectedUser = await UserModel.find({ _id: id });
+    let userID = req.params.userID;
+    req.user = await UserModel.findOne({ _id: userID }, '-hashed_password -salt');
     res.json({
       message: "User found succesfully",
       success: true,
-      selectedUser,
     });
   } catch (err) {
     console.log(err);
     next(err)
   }
 }
+
+exports.read = function (req, res) {
+  res.json(req.user);
+};
 
 module.exports.create = async function (req, res, next) {
   try {
     let newUser = new UserModel(req.body);
-    let createdUser = await UserModel.create(newUser);
-    res.json({
-      message: "User created succesfully",
-      success: true,
-      createdUser,
-    });
-  } catch (err) {
-    console.log(err);
-    next(err)
+
+    let result = await UserModel.create(newUser);
+    res.json(
+      {
+        success: true,
+        message: "User created sucessfully.",
+        result
+      }
+    );
+  } catch (error) {
+    console.log(error);
+    next(error)
   }
 }
 
-module.exports.update = async function (req, res, next) {
+exports.update = async (req, res, next) => {
   try {
-    let id = req.params.id;
-    let userToUpdate = await UserModel.updateOne({ _id: id }, {
-      ...req.body,
-    });
-  res.json({
-    message: "User updated succesfully",
-    success: true,
-    userToUpdate,
-  });
-} catch (err) {
-  console.log(err);
-  next(err)
-}
+    let userId = req.params.userId;
+    let updatedUser = UserModel(req.body);
+    updatedUser._id = userId;
+
+    let result = await UserModel.updateOne({ _id: userId }, updatedUser);
+    console.log(result);
+    if (result.modifiedCount > 0) {
+      res.json(
+        {
+          success: true,
+          message: "User updated sucessfully."
+        }
+      );
+    }
+    else {
+      // Express will catch this on its own.
+      throw new Error('User not updated. Are you sure it exists?')
+    }
+  } catch (error) {
+    next(error)
+  }
 }
 
-module.exports.erase = async function (req, res, next) {
+module.exports.remove = async (req, res, next) => {
   try {
-    let id = req.params.id;
-    let erasedUser = await UserModel.deleteOne({ _id: id });
-    res.json({
-      message: "User deleted succesfully",
-      success: true,
-      erasedUser,
-    });
-  } catch (err) {
-    console.log(err);
-    next(err)
+    let id = req.params.userId;
+    let result = await UserModel.deleteOne({ _id: id });
+    console.log("====> Result: ", result);
+    if (result.deletedCount > 0) {
+      res.json(
+        {
+          success: true,
+          message: "User deleted sucessfully."
+        }
+      )
+    }
+    else {
+      throw new Error('User not deleted. Are you sure it exists?')
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
   }
+}
+
+module.exports.setAdmin = async function (req, res, next) {
+
+  try {
+    // Check if the current user is admin
+    let authorized = await UserModel.findOne({ _id: req.auth.id }, 'admin');
+
+    if (!authorized) {
+      return res.status('403').json(
+        {
+          success: false,
+          message: "User is not authorized"
+        }
+      )
+    }
+    else {
+      let result = await UserModel.updateOne({ _id: req.params.userId }, { admin: true });
+      console.log("setAdmin", result);
+      if (result.modifiedCount > 0) {
+        res.json(
+          {
+            success: true,
+            message: "User promoted successfully."
+          }
+        );
+      }
+      else {
+        throw new Error('User not updated. Are you sure it exists?')
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    next(error)
+  }
+
 }

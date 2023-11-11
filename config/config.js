@@ -2,5 +2,6 @@
 require('dotenv').config()
 
 module.exports = {
+  "SECRETKEY": process.env.JWT_SECRET_KEY,
   "ATLAS_DB" : process.env.ATLAS_DB
 }

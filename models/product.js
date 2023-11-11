@@ -1,20 +1,33 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const ProductSchema = new Schema({
+const ProductSchema = new Schema(
+  {
     title: String,
     description: String,
     price: Number,
     currency: String,
     location: String,
-    seller: {
-      id: String,
-      name: String
-    },
     image: String,
     category: String,
-    postedAt: Date
-  });
+    postedAt: Date,
+    // Adds relationship with User
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  },
+  {
+    collection: "products"
+  }
+);
+
+// Ensure virtual fields are serialised.
+ProductSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) { delete ret._id }
+});
 
 module.exports = mongoose.model('product', ProductSchema);
 
