@@ -1,14 +1,34 @@
-// May be of use for developing endpoints
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-// const mongoose = require('mongoose');
-// const Schema = mongoose.Schema;
+const ProductSchema = new Schema(
+  {
+    title: String,
+    description: String,
+    price: Number,
+    currency: String,
+    location: String,
+    image: String,
+    category: String,
+    postedAt: Date,
+    // Adds relationship with User
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  },
+  {
+    collection: "products"
+  }
+);
 
-// const ProductSchema = new Schema({
-//   name: String,
-//   description: String,
-//   price: Number,
-//   published: Boolean,
-//   category: String,
-// });
+// Ensure virtual fields are serialised.
+ProductSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) { delete ret._id }
+});
 
-// module.exports = mongoose.model('product', ProductSchema);
+module.exports = mongoose.model('product', ProductSchema);
+
+
