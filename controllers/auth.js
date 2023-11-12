@@ -48,7 +48,6 @@ module.exports.requireSignin = expressjwt({
 
 // Checks if the requester is allowed to perform the action.
 module.exports.hasAuthorization = async function (req, res, next) {
-    
     let authorized = req.auth && req.user && req.user.username == req.auth.username
 
     if (!(authorized)) {
@@ -64,7 +63,6 @@ module.exports.hasAuthorization = async function (req, res, next) {
 
 // Validates the owner of the item.
 exports.isAllowed = async function (req, res, next){
-
     try {
         let id = req.params.id
         let productItem = await Product.findById(id).populate('owner');   
@@ -80,8 +78,7 @@ exports.isAllowed = async function (req, res, next){
                 let currentUser = await User.findOne({_id: req.auth.id}, 'admin');
   
                 if(currentUser.admin != true){ // If the user is not a Admin
-                    
-                    console.log('====> Not authorized');
+                
                     return res.status(403).json(
                         { 
                             success: false, 

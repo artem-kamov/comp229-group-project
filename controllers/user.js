@@ -16,12 +16,9 @@ module.exports.list = async function (req, res, next) {
 
 module.exports.userByID = async function (req, res, next) {
   try {
-    let userID = req.params.userID;
+    let userID = req.params.userId;
     req.user = await UserModel.findOne({ _id: userID }, '-hashed_password -salt');
-    res.json({
-      message: "User found succesfully",
-      success: true,
-    });
+    next();
   } catch (err) {
     console.log(err);
     next(err)
@@ -31,24 +28,6 @@ module.exports.userByID = async function (req, res, next) {
 exports.read = function (req, res) {
   res.json(req.user);
 };
-
-module.exports.create = async function (req, res, next) {
-  try {
-    let newUser = new UserModel(req.body);
-
-    let result = await UserModel.create(newUser);
-    res.json(
-      {
-        success: true,
-        message: "User created sucessfully.",
-        result
-      }
-    );
-  } catch (error) {
-    console.log(error);
-    next(error)
-  }
-}
 
 exports.update = async (req, res, next) => {
   try {
@@ -62,7 +41,7 @@ exports.update = async (req, res, next) => {
       res.json(
         {
           success: true,
-          message: "User updated sucessfully."
+          message: "User updated successfully."
         }
       );
     }
@@ -75,16 +54,33 @@ exports.update = async (req, res, next) => {
   }
 }
 
+module.exports.create = async function (req, res, next) {
+  try {
+    let newUser = new UserModel(req.body);
+
+    let result = await UserModel.create(newUser);
+    res.json(
+      {
+        success: true,
+        message: "User created successfully.",
+        result
+      }
+    );
+  } catch (error) {
+    console.log(error);
+    next(error)
+  }
+}
+
 module.exports.remove = async (req, res, next) => {
   try {
     let id = req.params.userId;
     let result = await UserModel.deleteOne({ _id: id });
-    console.log("====> Result: ", result);
     if (result.deletedCount > 0) {
       res.json(
         {
           success: true,
-          message: "User deleted sucessfully."
+          message: "User deleted successfully."
         }
       )
     }
@@ -132,3 +128,4 @@ module.exports.setAdmin = async function (req, res, next) {
   }
 
 }
+

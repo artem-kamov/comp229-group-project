@@ -18,7 +18,7 @@ const UserSchema = new Schema({
   },
   hashed_password: {
     type: String,
-    required: 'Passowrd is required',
+    required: 'Password is required',
     // validate: [(password) => {
     //   return password && password.length > 5;
     // }, 'Password must be at least 6 characters.']

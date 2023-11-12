@@ -31,7 +31,6 @@ module.exports.listOne = async function (req, res, next) {
 
 module.exports.processAddProduct = async function (req, res, next) {
   try {
-    console.log("req.auth: ", req.auth);
 
     let newProduct = ProductModel({
       title: req.body.title,
@@ -63,26 +62,13 @@ module.exports.update = async function (req, res, next) {
   try {
     let id = req.params.id;
 
-    let updateProduct = ProductModel({
-      title: req.body.title,
-      description: req.body.description,
-      price: req.body.price,
-      currency: req.body.currency,
-      location: req.body.location,
-      image: req.body.image,
-      category: req.body.category,
-      postedAt: req.body.postedAt,
-      owner: (req.body.owner == null || req.body.owner == "") ? req.auth.id : req.body.owner
-    });
-
-    let result = await ProductModel.updateOne({ _id: id }, updateProduct);
-    console.log(result);
+    let result = await ProductModel.updateOne({ _id: id }, req.body);
 
     if (result.modifiedCount > 0) {
       res.json(
         {
           success: true,
-          message: "Listing updated sucessfully."
+          message: "Listing updated successfully."
         }
       );
     }
@@ -101,13 +87,11 @@ module.exports.erase = async function (req, res, next) {
     let id = req.params.id;
 
     let result = await ProductModel.deleteOne({ _id: id });
-
-    console.log("====> Result: ", result);
     if (result.deletedCount > 0) {
       res.json(
         {
           success: true,
-          message: "Item deleted sucessfully."
+          message: "Item deleted successfully."
         }
       )
     }
