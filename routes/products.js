@@ -14,7 +14,9 @@ router.get('/list',productController.list )
 router.get('/get/:id', productController.listOne)
 
 /* POST Route for creating new product */
-router.post('/add', productController.processAddProduct)
+router.post('/add', 
+authController.requireSignin, 
+productController.processAddProduct)
 
 // router.param('userId', userController.userByID);
 
