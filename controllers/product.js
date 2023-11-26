@@ -31,7 +31,6 @@ module.exports.listOne = async function (req, res, next) {
 
 module.exports.processAddProduct = async function (req, res, next) {
   try {
-
     let newProduct = ProductModel({
       title: req.body.title,
       description: req.body.description,
