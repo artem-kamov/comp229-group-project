@@ -3,7 +3,6 @@ var router = express.Router();
 
 let productController = require("../controllers/product");
 let authController= require ("../controllers/auth");
-let userController = require('../controllers/user');
 
 // Unprotected routes
 
@@ -17,8 +16,6 @@ router.get('/get/:id', productController.listOne)
 router.post('/add', 
 authController.requireSignin, 
 productController.processAddProduct)
-
-// router.param('userId', userController.userByID);
 
 // Protected routes
 /* Router to edit listed product */
