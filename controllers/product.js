@@ -29,8 +29,12 @@ module.exports.listOne = async function (req, res, next) {
   }
 }
 
+
 module.exports.processAddProduct = async function (req, res, next) {
   try {
+    const endDateString = req.body.endDate;
+    const endDate = endDateString ? new Date(endDateString) : null;
+
     let newProduct = ProductModel({
       title: req.body.title,
       description: req.body.description,
@@ -40,44 +44,66 @@ module.exports.processAddProduct = async function (req, res, next) {
       image: req.body.image,
       category: req.body.category,
       postedAt: req.body.postedAt,
-      owner: (req.body.owner == null || req.body.owner == "") ? req.auth.id : req.body.owner
+      owner: req.body.owner || req.auth.id,
+      lifetime: {
+        endDate: endDate,
+      },
     });
 
     let result = await ProductModel.create(newProduct);
 
     console.log(result);
     res.json({
-      message: "Product created succesfully",
+      message: "Product created successfully",
       success: true,
       result,
     });
   } catch (err) {
     console.log(err);
-    next(err)
+    next(err);
   }
 }
 
 module.exports.update = async function (req, res, next) {
   try {
     let id = req.params.id;
+    const endDateString = req.body.endDate;
+    const endDate = endDateString ? new Date(endDateString) : null;
+    const existingProduct = await ProductModel.findById(id);
 
-    let result = await ProductModel.updateOne({ _id: id }, req.body);
+    if (!existingProduct) {
+      throw new Error('Listing not found. Are you sure it exists?');
+    }
+
+    if (existingProduct.lifetime && existingProduct.lifetime.endDate && existingProduct.lifetime.endDate <= new Date()) {
+      throw new Error('Cannot update. End date has passed.');
+    }
+
+    if (endDate && endDate <= new Date()) {
+      throw new Error('Cannot update. Provided end date is in the past.');
+    }
+
+    req.body = {
+      ...req.body,
+      lifetime: {
+        endDate: endDate,
+      },
+    };
+
+    let result = await ProductModel.updateOne({ _id: id, isActive: true }, req.body);
 
     if (result.modifiedCount > 0) {
-      res.json(
-        {
-          success: true,
-          message: "Listing updated successfully."
-        }
-      );
-    }
-    else {
-      throw new Error('Listing not updated. Are you sure it exists?')
+      res.json({
+        success: true,
+        message: "Listing updated successfully."
+      });
+    } else {
+      throw new Error('Listing not updated. Are you sure it exists or is active?');
     }
 
   } catch (err) {
     console.log(err);
-    next(err)
+    next(err);
   }
 }
 
