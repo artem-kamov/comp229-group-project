@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 let ProductModel = require('../models/product');
 
 module.exports.list = async function (req, res, next) {
@@ -16,8 +17,8 @@ module.exports.list = async function (req, res, next) {
 
 module.exports.listOne = async function (req, res, next) {
   try {
-    let id = req.params.id;
-    let selectedProduct = await ProductModel.find({ _id: req.params.id });
+    let id = new mongoose.Types.ObjectId(req.params.id);
+    let selectedProduct = await ProductModel.findOne({ _id: id });
     res.json({
       message: "Product found succesfully",
       success: true,
